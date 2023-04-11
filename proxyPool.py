@@ -13,6 +13,7 @@
 __author__ = 'JHao'
 
 import click
+
 from helper.launcher import startServer, startScheduler
 from setting import BANNER, VERSION
 

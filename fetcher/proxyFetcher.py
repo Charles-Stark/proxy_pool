@@ -12,8 +12,9 @@
 """
 __author__ = 'JHao'
 
-import re
 import json
+import random
+import re
 from time import sleep
 
 from util.webRequest import WebRequest
@@ -223,6 +224,85 @@ class ProxyFetcher(object):
     #         for proxy in proxies:
     #             yield ':'.join(proxy)
 
+    @staticmethod
+    def gfw_proxy_1():
+        """
+        Geonode
+        https://geonode.com/free-proxy-list
+        """
+        base_url = 'https://proxylist.geonode.com/api/proxy-list?limit=50&page=1&sort_by=lastChecked&sort_type=desc&protocols=http%2Chttps'
+        resp = WebRequest().get(base_url).json
+        for proxy in resp['data']:
+            yield "%s:%s" % (proxy["ip"], proxy["port"])
+
+    @staticmethod
+    def gfw_proxy_2():
+        """
+        Free Proxy List
+        https://free-proxy-list.net/
+        """
+        base_url = 'https://free-proxy-list.net/'
+        html_tree = WebRequest().get(base_url).tree
+        tbody = html_tree.xpath('//*[@id="list"]/div/div[2]/div/table/tbody/tr')
+        for tr in tbody:
+            ip = ''.join(tr.xpath('./td[1]/text()')).strip()
+            port = ''.join(tr.xpath('./td[2]/text()')).strip()
+            yield '%s:%s' % (ip, port)
+
+    @staticmethod
+    def gfw_proxy_3():
+        """
+        Proxy Docker
+        https://www.proxydocker.com/
+        """
+        token_url = 'https://www.proxydocker.com/'
+        proxy_url = 'https://www.proxydocker.com/en/api/proxylist/'
+        proxy_types = ['http-https', 'http', 'https']
+        data = {
+            'token': None,
+            'country': 'all',
+            'city': 'all',
+            'state': 'all',
+            'port': 'all',
+            'type': None,
+            'anonymity': 'all',
+            'need': 'all',
+            'page': 1,
+        }
+
+        for proxy_type in proxy_types:
+            data['type'] = proxy_type
+            print(proxy_type)
+            for page in range(1, 4):
+                data['page'] = page
+                print(page)
+
+                token = WebRequest().get(token_url).tree.xpath('//meta[@name="_token"]/@content')[0]
+                data['token'] = token
+                print('token: ', token)
+
+                resp = WebRequest().post(proxy_url, data).json
+                for proxy in resp['proxies']:
+                    print(proxy)
+                    yield "%s:%s" % (proxy["ip"], proxy["port"])
+                sleep(random.randint(4, 6))
+
+    @staticmethod
+    def gfw_proxy_4():
+        """
+        fate0 proxy list
+        http://proxylist.fatezero.org/
+        """
+        base_url = 'http://proxylist.fatezero.org/proxy.list'
+        try:
+            resp_text = WebRequest().get(base_url).text
+            for each in resp_text.split('\n'):
+                proxy_json = json.loads(each)
+                if proxy_json['country'] != 'CN':
+                    yield '%s:%s' % (proxy_json['host'], proxy_json['port'])
+        except Exception as e:
+            print(e)
+
 
 if __name__ == '__main__':
     p = ProxyFetcher()
@@ -230,8 +310,3 @@ if __name__ == '__main__':
         print(_)
 
 # http://nntime.com/proxy-list-01.htm
-
-
-# freeProxy04
-# freeProxy07
-# freeProxy08

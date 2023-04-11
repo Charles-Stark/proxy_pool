@@ -12,11 +12,12 @@
 """
 __author__ = 'J_hao'
 
-from requests.models import Response
-from lxml import etree
-import requests
 import random
 import time
+
+import requests
+from lxml import etree
+from requests.models import Response
 
 from handler.logHandler import LogHandler
 
@@ -86,6 +87,34 @@ class WebRequest(object):
                 self.log.info("retry %s second after" % retry_interval)
                 time.sleep(retry_interval)
 
+    def post(self, url, data, header=None, retry_time=3, retry_interval=5, timeout=5, *args, **kwargs):
+        """
+        post method
+        :param url: target url
+        :param data: post data
+        :param header: headers
+        :param retry_time: retry time
+        :param retry_interval: retry interval
+        :param timeout: network timeout
+        :return:
+        """
+        headers = self.header
+        if header and isinstance(header, dict):
+            headers.update(header)
+        while True:
+            try:
+                self.response = requests.post(url, data, headers=headers, timeout=timeout, *args, **kwargs)
+                return self
+            except Exception as e:
+                retry_time -= 1
+                self.log.error("requests: %s error: %s" % (url, str(e)))
+                if retry_time <= 0:
+                    resp = Response()
+                    resp.status_code = 200
+                    return self
+                self.log.info("retry %s second after" % retry_interval)
+                time.sleep(retry_interval)
+
     @property
     def tree(self):
         return etree.HTML(self.response.content)
@@ -101,4 +130,3 @@ class WebRequest(object):
         except Exception as e:
             self.log.error(str(e))
             return {}
-

@@ -37,31 +37,35 @@ PORT = 5010
 # example:
 #      Redis: redis://:password@ip:port/db
 #      Ssdb:  ssdb://:password@ip:port
-DB_CONN = 'redis://:pwd@127.0.0.1:6379/0'
+DB_CONN = 'redis://:@127.0.0.1:6379/0'
 
 # proxy table name
 TABLE_NAME = 'use_proxy'
 
-
 # ###### config the proxy fetch function ######
 PROXY_FETCHER = [
-    "freeProxy01",
-    "freeProxy02",
-    "freeProxy03",
-    "freeProxy04",
-    "freeProxy05",
-    "freeProxy06",
-    "freeProxy07",
-    "freeProxy08",
-    "freeProxy09",
-    "freeProxy10"
+    # "freeProxy01",
+    # "freeProxy02",
+    # "freeProxy03",
+    # "freeProxy04",
+    # "freeProxy05",
+    # "freeProxy06",
+    # "freeProxy07",
+    # "freeProxy08",
+    # "freeProxy09",
+    # "freeProxy10",
+
+    "gfw_proxy_1",
+    "gfw_proxy_2",
+    # "gfw_proxy_3",  // not available yet
+    "gfw_proxy_4",
 ]
 
 # ############# proxy validator #################
 # 代理验证目标网站
 HTTP_URL = "http://httpbin.org"
 
-HTTPS_URL = "https://www.qq.com"
+HTTPS_URL = "https://twitter.com/"
 
 # 代理验证时超时时间
 VERIFY_TIMEOUT = 10
@@ -81,11 +85,11 @@ PROXY_REGION = True
 
 # ############# scheduler config #################
 
-# Set the timezone for the scheduler forcely (optional)
+# Set the timezone for the scheduler forcibly (optional)
 # If it is running on a VM, and
 #   "ValueError: Timezone offset does not match system offset"
 #   was raised during scheduling.
 # Please uncomment the following line and set a timezone for the scheduler.
-# Otherwise it will detect the timezone from the system automatically.
+# Otherwise, it will detect the timezone from the system automatically.
 
 TIMEZONE = "Asia/Shanghai"
